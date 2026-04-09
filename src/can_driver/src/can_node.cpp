@@ -1,6 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "can_driver/can_driver.hpp"
-//#include "j1939_parser/j1939_parser.hpp"
+#include "custom_msgs/msg/can_frame.hpp"
 
 class CanNode : public rclcpp::Node
 {
@@ -9,12 +9,12 @@ public:
     {
         driver_.init("can0");
         // ROS -> CAN
-        sub_ = create_subscription<can_frame>(
+        sub_ = create_subscription<custom_msgs::msg::CanFrame>(
             "/can_tx", 50,
             std::bind(&CanNode::txCallback, this, std::placeholders::_1));
 
         // CAN -> ROS
-        pub_ = create_publisher<can_frame>("/can_rx", 50);
+        pub_ = create_publisher<custom_msgs::msg::CanFrame>("/can_rx", 50);
         recv_thread_ = std::thread(&CanNode::recvLoop, this);
     }
 
@@ -27,8 +27,17 @@ public:
 
 private:
     // tx
-    void txCallback(const can_frame frame)
+    void txCallback(const custom_msgs::msg::CanFrame::SharedPtr msg)
     {
+        can_frame frame{};
+        
+        frame.can_id = msg -> id;
+        frame.can_dlc = msg -> dlc;
+        for(int i=0; i<frame.can_dlc; i++)
+        {
+            frame.data[i] = msg -> data[i];
+        }
+
         driver_.sendFrame(frame);
 
          RCLCPP_INFO(this->get_logger(),
@@ -44,7 +53,14 @@ private:
         {
             if (driver_.receiveFrame(frame))
             {
-                pub_->publish(frame);
+                custom_msgs::msg::CanFrame msg;
+                msg.id = frame.can_id;
+                msg.dlc = frame.can_dlc;
+                for(int i=0; i<frame.can_dlc; i++)
+                {
+                    msg.data[i] = frame.data[i];
+                }
+                pub_->publish(msg);
                 
                 RCLCPP_INFO(this->get_logger(),
                             "RX CAN ID: 0x%X DLC: %d",
@@ -56,8 +72,8 @@ private:
 private:
     CanDriver driver_;
 
-    rclcpp::Subscription<can_frame>::SharedPtr sub_;
-    rclcpp::Publisher<can_frame>::SharedPtr pub_;
+    rclcpp::Subscription<custom_msgs::msg::CanFrame>::SharedPtr sub_;
+    rclcpp::Publisher<custom_msgs::msg::CanFrame>::SharedPtr pub_;
 
     std::thread recv_thread_;
     bool running_ = true;

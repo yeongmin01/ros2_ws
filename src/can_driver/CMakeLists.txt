@@ -9,14 +9,17 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(custom_msgs REQUIRED)
 
 include_directories(include)
 
 add_library(can_driver src/can_driver.cpp)
-ament_target_dependencies(can_driver rclcpp std_msgs) # 의존성 연결
+ament_target_dependencies(can_driver rclcpp std_msgs custom_msgs) # 의존성 연결
 
 add_executable(can_node src/can_node.cpp) # 새로운 실행 파일
-ament_target_dependencies(can_node rclcpp std_msgs) # 의존성 연결
+ament_target_dependencies(can_node rclcpp std_msgs custom_msgs) # 의존성 연결
+
+target_link_libraries(can_node can_driver)
 
 install(TARGETS can_node DESTINATION lib/${PROJECT_NAME})
 

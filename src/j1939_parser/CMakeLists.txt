@@ -19,9 +19,7 @@ ament_target_dependencies(j1939_parser rclcpp custom_msgs) # 의존성 연결
 add_executable(j1939_node src/j1939_node.cpp) # 새로운 실행 파일
 ament_target_dependencies(j1939_node rclcpp custom_msgs) # 의존성 연결
 
-#ament_export_include_directories(include)
-#ament_export_libraries(j1939_parser)
-#ament_export_dependencies(rclcpp custom_msgs)
+target_link_libraries(j1939_node j1939_parser)
 
 install(TARGETS j1939_node DESTINATION lib/${PROJECT_NAME})
 

@@ -1,9 +1,11 @@
 #include "j1939_parser/j1939_parser.hpp"
+#include "custom_msgs/msg/can_frame.hpp"
+#include "custom_msgs/msg/j1939_msg.hpp"
 
 // J1939 Msg Format -> Raw CAN Msg Format
-struct can_frame J1939Parser::build(const custom_msgs::msg::J1939Msg &msg)
+custom_msgs::msg::CanFrame J1939Parser::build(const custom_msgs::msg::J1939Msg &msg)
 {
-    struct can_frame frame{};
+    custom_msgs::msg::CanFrame frame{};
     uint32_t id = 0;
 
     uint8_t pf = (msg.pgn >> 8) & 0xFF;
@@ -18,8 +20,8 @@ struct can_frame J1939Parser::build(const custom_msgs::msg::J1939Msg &msg)
     id |= (ps << 8);
     id |= msg.source_address;
 
-    frame.can_id = id | CAN_EFF_FLAG;
-    frame.can_dlc = msg.dlc;
+    frame.id = id | CAN_EFF_FLAG;
+    frame.dlc = msg.dlc;
 
     for (int i = 0; i < msg.dlc; i++)
         frame.data[i] = msg.data[i];
@@ -47,18 +49,18 @@ uint32_t J1939Parser::extractPGN(uint32_t can_id)
 }
 
 // Raw CAN Msg Format -> J1939 Msg Format
-custom_msgs::msg::J1939Msg J1939Parser::parse(const struct can_frame& frame)
+custom_msgs::msg::J1939Msg J1939Parser::parse(const custom_msgs::msg::CanFrame &frame)
 {
     custom_msgs::msg::J1939Msg j;
 
-    uint32_t id = frame.can_id & CAN_EFF_MASK;
+    uint32_t id = frame.id & CAN_EFF_MASK;
 
     j.priority = (id >> 26) & 0x07;
     j.source_address = id & 0xFF;
     j.pgn = extractPGN(id);
-    j.dlc = frame.can_dlc;
+    j.dlc = frame.dlc;
 
-    for (int i = 0; i < frame.can_dlc; i++)
+    for (int i = 0; i < frame.dlc; i++)
     {
         j.data[i] = frame.data[i];
     }

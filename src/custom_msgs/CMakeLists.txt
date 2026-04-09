@@ -13,6 +13,7 @@ find_package(std_msgs REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/RCCmd.msg"
   "msg/J1939Msg.msg"
+  "msg/CanFrame.msg"
 )
 
 if(BUILD_TESTING)

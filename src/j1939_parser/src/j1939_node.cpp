@@ -1,4 +1,5 @@
 #include "rclcpp/rclcpp.hpp"
+#include "custom_msgs/msg/can_frame.hpp"
 #include "custom_msgs/msg/j1939_msg.hpp"
 #include "j1939_parser/j1939_parser.hpp"
 
@@ -9,7 +10,7 @@ public:
     {
         // RX: CAN → J1939
         // can_driver -> j1939_parser
-        sub_can_ = create_subscription<can_frame>(
+        sub_can_ = create_subscription<custom_msgs::msg::CanFrame>(
             "/can_rx", 50,
             std::bind(&J1939Node::canCallback, this, std::placeholders::_1));
         // j1939_parser -> other j1939 device pkg
@@ -21,12 +22,12 @@ public:
             "/j1939_tx", 50,
             std::bind(&J1939Node::j1939Callback, this, std::placeholders::_1));
         // j1939_parser -> can_driver
-        pub_can_ = create_publisher<can_frame>("/can_tx", 50);
+        pub_can_ = create_publisher<custom_msgs::msg::CanFrame>("/can_tx", 50);
     }
 
 private:
     // 🔵 CAN → J1939
-    void canCallback(const can_frame::SharedPtr frame)
+    void canCallback(const custom_msgs::msg::CanFrame::SharedPtr frame)
     {
         // 1. raw → j1939
         auto j = J1939Parser::parse(*frame);
@@ -52,11 +53,11 @@ private:
     }
 
 private:
-    rclcpp::Subscription<can_frame>::SharedPtr sub_can_;
+    rclcpp::Subscription<custom_msgs::msg::CanFrame>::SharedPtr sub_can_;
     rclcpp::Publisher<custom_msgs::msg::J1939Msg>::SharedPtr pub_j1939_;
 
     rclcpp::Subscription<custom_msgs::msg::J1939Msg>::SharedPtr sub_j1939_;
-    rclcpp::Publisher<can_frame>::SharedPtr pub_can_;
+    rclcpp::Publisher<custom_msgs::msg::CanFrame>::SharedPtr pub_can_;
 };
 
 int main(int argc, char **argv)

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <linux/can.h>
+#include "custom_msgs/msg/can_frame.hpp"
 
 class CanDriver
 {
