@@ -1,2 +1,0 @@
-uint8 velocity_input
-uint8 steering_angle_input
