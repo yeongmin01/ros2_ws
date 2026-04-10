@@ -1,0 +1,2 @@
+uint16 md1_velocity_req
+uint16 md2_velocity_req
