@@ -1,2 +1,2 @@
-uint16 md1_velocity_cur
-uint16 md2_velocity_cur
+float32 md1_velocity_cur
+float32 md2_velocity_cur

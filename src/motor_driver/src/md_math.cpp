@@ -1,6 +1,6 @@
 #include "motor_driver/md_math.hpp"
 
-int16_t MDMath::convertVelocityToRPM(int16_t velocity)
+int16_t MDMath::convertVelocityToRPM(float velocity)
 {
     int16_t rpm = 0;
     
@@ -9,11 +9,17 @@ int16_t MDMath::convertVelocityToRPM(int16_t velocity)
     return rpm;
 }
 
-int16_t MDMath::setVelocityReq(int16_t cur_vel, int16_t torque_req)
+float MDMath::setVelocityReq(float cur_vel, int16_t torque_req)
 {
-    int16_t velocity_req = cur_vel;
-    
-    velocity_req += max_acceleration * torque_req/max_torque;
+    float velocity_req = cur_vel;
+
+    // 100ms
+    velocity_req += (max_acceleration/10) * torque_req/max_torque;
+
+    if(velocity_req >= max_velocity)
+    {
+        velocity_req = max_velocity;
+    }
 
     return velocity_req;
 }

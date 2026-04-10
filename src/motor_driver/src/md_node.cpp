@@ -31,7 +31,7 @@ public:
         velocity_req_pub_ = create_publisher<custom_msgs::msg::VelocityReq>("/velocity_req", 50);
 
         set_velocity_req_timer_ = create_wall_timer(
-            std::chrono::milliseconds(50),
+            std::chrono::milliseconds(100),
             std::bind(&MotorDriverNode::setVelocityReqLoop, this));
 
         // issac sim -> md_driver (curent velocity)
@@ -108,7 +108,7 @@ private:
         velocity_req.md2_velocity_req = md2_cmd.velocity_req;
 
         velocity_req_pub_->publish(velocity_req);
-        RCLCPP_INFO(this->get_logger(), "MD1 Velocity Req: %d MD2 Velocity Req: %d", md1_cur.rpm_cur, md2_cur.rpm_cur);
+        RCLCPP_INFO(this->get_logger(), "MD1 Velocity Req: %f MD2 Velocity Req: %f", md1_cur.velocity_cur, md2_cur.velocity_cur);
     }
 
     // issac sim으로 부터 전달된 현재 velocity

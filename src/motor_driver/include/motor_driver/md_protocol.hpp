@@ -15,12 +15,12 @@ namespace MDProtocol
     struct MDCmd
     {
         int16_t torque_req; // vcu -> emulator request torque
-        int16_t velocity_req; // emulator -> issac sim request velocity
+        float velocity_req; // emulator -> issac sim request velocity
     };
 
     struct MDCur
     {
-        int16_t velocity_cur; // issac sim -> emulator current velocity
+        float velocity_cur; // issac sim -> emulator current velocity
         int16_t rpm_cur; // emulator -> vcu current RPM 
     };
 

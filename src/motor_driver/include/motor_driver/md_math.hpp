@@ -5,8 +5,8 @@
 class MDMath
 {
     public:
-        static int16_t convertVelocityToRPM(int16_t velocity);
-        static int16_t setVelocityReq(int16_t cur_vel, int16_t torque_req);
+        static int16_t convertVelocityToRPM(float velocity);
+        static float setVelocityReq(float cur_vel, int16_t torque_req);
     
         static constexpr float max_velocity = 8.3f; // m/s
         static constexpr uint8_t max_torque = 50;
