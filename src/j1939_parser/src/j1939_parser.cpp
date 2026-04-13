@@ -2,6 +2,12 @@
 #include "custom_msgs/msg/can_frame.hpp"
 #include "custom_msgs/msg/j1939_msg.hpp"
 
+// J1939 여부 판단
+bool J1939Parser::isJ1939(uint32_t can_id)
+{
+    return can_id & CAN_EFF_FLAG;
+}
+
 // J1939 Msg Format -> Raw CAN Msg Format
 custom_msgs::msg::CanFrame J1939Parser::build(const custom_msgs::msg::J1939Msg &msg)
 {

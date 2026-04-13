@@ -7,6 +7,7 @@
 class J1939Parser
 {
     public:
+        static bool isJ1939(uint32_t can_id);
         static custom_msgs::msg::CanFrame build(const custom_msgs::msg::J1939Msg &msg);
         static custom_msgs::msg::J1939Msg parse(const custom_msgs::msg::CanFrame &frame);
     private:
