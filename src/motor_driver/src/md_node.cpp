@@ -27,14 +27,14 @@ public:
             std::chrono::milliseconds(50),
             std::bind(&MotorDriverNode::mdToVCUSendLoop, this));
         
-        // md_driver -> issac sim (velocity request)
+        // md_driver -> Emulator manager (velocity request)
         velocity_req_pub_ = create_publisher<custom_msgs::msg::VelocityReq>("/velocity_req", 50);
 
         set_velocity_req_timer_ = create_wall_timer(
             std::chrono::milliseconds(100),
             std::bind(&MotorDriverNode::setVelocityReqLoop, this));
 
-        // issac sim -> md_driver (curent velocity)
+        // Emulator manager -> md_driver (curent velocity)
         velocity_cur_sub_ = create_subscription<custom_msgs::msg::VelocityCur>(
             "/velocity_cur", 50,
             std::bind(&MotorDriverNode::velocityCurCallback, this, std::placeholders::_1));
@@ -127,10 +127,10 @@ private:
     rclcpp::TimerBase::SharedPtr md_to_vcu_send_timer_;
     rclcpp::TimerBase::SharedPtr set_velocity_req_timer_;
 
-    MDProtocol::MDCmd md1_cmd;
-    MDProtocol::MDCur md1_cur;
-    MDProtocol::MDCmd md2_cmd;
-    MDProtocol::MDCur md2_cur;
+    MDProtocol::MDCmd md1_cmd = new MDProtocol::MDCmd();
+    MDProtocol::MDCur md1_cur = new MDProtocol::MDCur();
+    MDProtocol::MDCmd md2_cmd = new MDProtocol::MDCmd();
+    MDProtocol::MDCur md2_cur = new MDProtocol::MDCur();
 };
 
 int main(int argc, char **argv)
