@@ -15,9 +15,18 @@ namespace RCProtocol
 
     struct RCCmd
     {
-        uint16_t velocity = 0;
-        uint16_t steer = 0;
+        uint16_t velocity = 127;
+        uint16_t steer = 127;
     };
 
-    constexpr ProtocolConfig RCtoVCU_Protocol = {0xF500, 5, 0, 0xC8};
+    struct RCState
+    {
+        bool rc_start = true;
+        bool rc_forward = false;
+        bool rc_backward = false;
+        bool rc_not_crab = true;
+    };
+
+    constexpr ProtocolConfig RCCmdtoVCU_Protocol = {0xF500, 5, 0, 0xC8};
+    constexpr ProtocolConfig RCStatetoVCU_Protocol = {0xF501, 5, 0, 0xC8};
 }

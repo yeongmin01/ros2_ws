@@ -49,31 +49,93 @@ private:
         int key = getch_nonblock();
 
         if (key == 'w' && rc_cmd.velocity <= 250) rc_cmd.velocity += 1;
-        if (key == 's' && rc_cmd.velocity >= 10) rc_cmd.velocity -= 1;
-        if (key == 'a' && rc_cmd.steer < 250) rc_cmd.steer += 1;
+        if (key == 's' && rc_cmd.velocity > 127) rc_cmd.velocity -= 1;
+        if (key == 'a' && rc_cmd.steer < 249) rc_cmd.steer += 1;
         if (key == 'd' && rc_cmd.steer >= 10) rc_cmd.steer -= 1;
+        if (key == '1') 
+        {
+            rc_state.rc_forward = true;
+            rc_state.rc_backward = false;
+        }
+        if (key == '2') 
+        {
+            rc_state.rc_forward = false;
+            rc_state.rc_backward = true;
+        }
+        if (key == '3') 
+        {
+            rc_state.rc_not_crab = !rc_state.rc_not_crab;
+        }
 
-        publishJ1939();  // 항상 실행
+        publishRCCmd();  // 항상 실행
+
+        RCLCPP_INFO(this->get_logger(),"RC State [%s]  vel: %d steer: %d",getRCLog(rc_state).c_str(),  rc_cmd.velocity, rc_cmd.steer);
     }
-
-    void publishJ1939()
+    // RC Velocity, Steering angle Cmd publish
+    void publishRCCmd()
     {
         custom_msgs::msg::J1939Msg msg;
 
-        msg.priority = RCProtocol::RCtoVCU_Protocol.priority;
-        msg.pgn = RCProtocol::RCtoVCU_Protocol.pgn;
-        msg.source_address = RCProtocol::RCtoVCU_Protocol.source_address;
-        msg.dest_address = RCProtocol::RCtoVCU_Protocol.dest_address;
+        msg.priority = RCProtocol::RCCmdtoVCU_Protocol.priority;
+        msg.pgn = RCProtocol::RCCmdtoVCU_Protocol.pgn;
+        msg.source_address = RCProtocol::RCCmdtoVCU_Protocol.source_address;
+        msg.dest_address = RCProtocol::RCCmdtoVCU_Protocol.dest_address;
         msg.dlc = 8;
 
         msg.data[0] = rc_cmd.velocity & 0xFF;
         msg.data[2] = rc_cmd.steer & 0xFF;
 
         pub_->publish(msg);
+    }
+    // RC state publish
+    void publishRCState()
+    {
+        custom_msgs::msg::J1939Msg msg;
 
-        RCLCPP_INFO(this->get_logger(),
-                    "vel: %d steer: %d",
-                    rc_cmd.velocity, rc_cmd.steer);
+        msg.priority = RCProtocol::RCStatetoVCU_Protocol.priority;
+        msg.pgn = RCProtocol::RCStatetoVCU_Protocol.pgn;
+        msg.source_address = RCProtocol::RCStatetoVCU_Protocol.source_address;
+        msg.dest_address = RCProtocol::RCStatetoVCU_Protocol.dest_address;
+        msg.dlc = 8;
+
+        msg.data[2] = (msg.data[2] & ~(1 << 5)) | (rc_state.rc_not_crab << 5);
+        msg.data[2] = (msg.data[2] & ~(1 << 6)) | (rc_state.rc_forward << 6);
+        msg.data[2] = (msg.data[2] & ~(1 << 7)) | (rc_state.rc_backward << 7);
+        msg.data[3] = (msg.data[3] & ~(1 << 6)) | (rc_state.rc_start << 6);
+
+        pub_->publish(msg);
+    }
+
+    std::string getRCLog(RCProtocol::RCState rc_state)
+    {
+        std::string rc_movement_log = "";
+        std::string rc_crab_mode_log = "";
+        if(rc_state.rc_forward && !rc_state.rc_backward)
+        {
+            rc_movement_log = "Forward";
+        }
+        if(!rc_state.rc_forward && rc_state.rc_backward)
+        {
+            rc_movement_log = "Backward";
+        }
+        if(!rc_state.rc_forward && !rc_state.rc_backward)
+        {
+            rc_movement_log = "Neutrality";
+        }
+        if(rc_state.rc_forward && rc_state.rc_backward)
+        {
+            rc_movement_log = "Invalid";
+        }
+        if(rc_state.rc_not_crab)
+        {
+            rc_crab_mode_log = "General";
+        }
+        else
+        {
+            rc_crab_mode_log = "Crab";
+        }
+
+        return rc_movement_log + ", " + rc_crab_mode_log;
     }
 
 private:
@@ -81,6 +143,7 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
 
     RCProtocol::RCCmd rc_cmd;
+    RCProtocol::RCState rc_state;
 };
 
 int main(int argc, char **argv)
