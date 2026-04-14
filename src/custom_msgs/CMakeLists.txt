@@ -18,7 +18,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/VelocityReq.msg"
   "msg/VelocityCur.msg"
   "msg/RcCmd.msg"
+  "msg/SteerReq.msg"
+  "msg/SteerCur.msg"
 )
+
+ament_export_dependencies(rosidl_default_runtime)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
