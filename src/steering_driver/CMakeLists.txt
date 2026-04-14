@@ -9,6 +9,25 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(custom_msgs REQUIRED)
+
+include_directories(include)
+
+add_library(steering_math src/steering_math.cpp) # 새로운 실행 파일
+ament_target_dependencies(steering_math rclcpp) # 의존성 연결
+
+add_executable(steering_node src/steering_node.cpp) # 새로운 실행 파일
+ament_target_dependencies(steering_node rclcpp custom_msgs) # 의존성 연결
+
+target_link_libraries(steering_node steering_math)
+
+install(TARGETS steering_math DESTINATION lib)
+
+install(TARGETS steering_node DESTINATION lib/${PROJECT_NAME})
+
+install(DIRECTORY include/
+  DESTINATION include
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
