@@ -67,7 +67,7 @@ private:
                 return;
         };
 
-        RCLCPP_INFO(this->get_logger(), "MD1 Torque Cmd: %d, MD1 Torque Cmd: %d", md1_cmd.torque_req, md2_cmd.torque_req);
+        //RCLCPP_INFO(this->get_logger(), "MD1 Torque Cmd: %d, MD1 Torque Cmd: %d", md1_cmd.torque_req, md2_cmd.torque_req);
     }
 
     // cur velocity를 cur RPM으로 변환 후 전달
@@ -75,7 +75,7 @@ private:
     {
         publishMDtoVCU(MDProtocol::MD1toVCU_Protocol, md1_cur);
         publishMDtoVCU(MDProtocol::MD2toVCU_Protocol, md2_cur);
-        RCLCPP_INFO(this->get_logger(), "MD1 RPM: %d MD2 RPM: %d", md1_cur.rpm_cur, md2_cur.rpm_cur);
+        //RCLCPP_INFO(this->get_logger(), "MD1 RPM: %d MD2 RPM: %d", md1_cur.rpm_cur, md2_cur.rpm_cur);
     }
 
     void publishMDtoVCU(MDProtocol::ProtocolConfig md_protocol, MDProtocol::MDCur md_cur)
@@ -108,7 +108,7 @@ private:
         velocity_req.md2_velocity_req = md2_cmd.velocity_req;
 
         velocity_req_pub_->publish(velocity_req);
-        RCLCPP_INFO(this->get_logger(), "MD1 Velocity Req: %f MD2 Velocity Req: %f", md1_cur.velocity_cur, md2_cur.velocity_cur);
+        //RCLCPP_INFO(this->get_logger(), "MD1 Velocity Req: %f MD2 Velocity Req: %f", md1_cur.velocity_cur, md2_cur.velocity_cur);
     }
 
     // issac sim으로 부터 전달된 현재 velocity
@@ -127,10 +127,10 @@ private:
     rclcpp::TimerBase::SharedPtr md_to_vcu_send_timer_;
     rclcpp::TimerBase::SharedPtr set_velocity_req_timer_;
 
-    MDProtocol::MDCmd md1_cmd = new MDProtocol::MDCmd();
-    MDProtocol::MDCur md1_cur = new MDProtocol::MDCur();
-    MDProtocol::MDCmd md2_cmd = new MDProtocol::MDCmd();
-    MDProtocol::MDCur md2_cur = new MDProtocol::MDCur();
+    MDProtocol::MDCmd md1_cmd{};
+    MDProtocol::MDCur md1_cur{};
+    MDProtocol::MDCmd md2_cmd{};
+    MDProtocol::MDCur md2_cur{};
 };
 
 int main(int argc, char **argv)

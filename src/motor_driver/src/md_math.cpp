@@ -14,7 +14,7 @@ float MDMath::setVelocityReq(float cur_vel, int16_t torque_req)
     float velocity_req = cur_vel;
 
     // 100ms
-    velocity_req += (max_acceleration/10) * torque_req/max_torque;
+    velocity_req += (max_acceleration/10) * static_cast<float>(torque_req)/static_cast<float>(max_torque);
 
     if(velocity_req >= max_velocity)
     {
