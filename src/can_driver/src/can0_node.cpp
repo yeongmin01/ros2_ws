@@ -2,23 +2,23 @@
 #include "can_driver/can_driver.hpp"
 #include "custom_msgs/msg/can_frame.hpp"
 
-class CanNode : public rclcpp::Node
+class Can0Node : public rclcpp::Node
 {
 public:
-    CanNode() : Node("can_node")
+    Can0Node() : Node("can0_node")
     {
         driver_.init("can0");
         // ROS -> CAN
         sub_ = create_subscription<custom_msgs::msg::CanFrame>(
-            "/can_tx", 50,
-            std::bind(&CanNode::txCallback, this, std::placeholders::_1));
+            "/can0_tx", 50,
+            std::bind(&Can0Node::txCallback, this, std::placeholders::_1));
 
         // CAN -> ROS
-        pub_ = create_publisher<custom_msgs::msg::CanFrame>("/can_rx", 50);
-        recv_thread_ = std::thread(&CanNode::recvLoop, this);
+        pub_ = create_publisher<custom_msgs::msg::CanFrame>("/can0_rx", 50);
+        recv_thread_ = std::thread(&Can0Node::recvLoop, this);
     }
 
-    ~CanNode()
+    ~Can0Node()
     {
         running_ = false;
         if (recv_thread_.joinable())
@@ -39,10 +39,6 @@ private:
         }
 
         driver_.sendFrame(frame);
-
-         RCLCPP_INFO(this->get_logger(),
-                    "TX CAN ID: 0x%X DLC: %d",
-                    frame.can_id, frame.can_dlc);
     }
     // rx
     void recvLoop()
@@ -61,10 +57,6 @@ private:
                     msg.data[i] = frame.data[i];
                 }
                 pub_->publish(msg);
-                
-                RCLCPP_INFO(this->get_logger(),
-                            "RX CAN ID: 0x%X DLC: %d",
-                            frame.can_id, frame.can_dlc);
             }
         }
     }
@@ -82,7 +74,7 @@ private:
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<CanNode>());
+    rclcpp::spin(std::make_shared<Can0Node>());
     rclcpp::shutdown();
     return 0;
 }

@@ -11,7 +11,7 @@ public:
         // RX: CAN → J1939
         // can_driver -> j1939_parser
         sub_can_ = create_subscription<custom_msgs::msg::CanFrame>(
-            "/can_rx", 50,
+            "/can0_rx", 50,
             std::bind(&J1939Node::canCallback, this, std::placeholders::_1));
         // j1939_parser -> other j1939 device pkg
         pub_j1939_ = create_publisher<custom_msgs::msg::J1939Msg>("/j1939_rx", 50);
@@ -22,7 +22,7 @@ public:
             "/j1939_tx", 50,
             std::bind(&J1939Node::j1939Callback, this, std::placeholders::_1));
         // j1939_parser -> can_driver
-        pub_can_ = create_publisher<custom_msgs::msg::CanFrame>("/can_tx", 50);
+        pub_can_ = create_publisher<custom_msgs::msg::CanFrame>("/can0_tx", 50);
     }
 
 private:
@@ -35,10 +35,6 @@ private:
 
         auto j = J1939Parser::parse(*frame);
         pub_j1939_->publish(j);
-
-         RCLCPP_INFO(this->get_logger(),
-                        "RX PGN: 0x%X SA: %d",
-                        j.pgn, j.source_address);
     }
 
     // 🔴 J1939 → CAN
@@ -49,10 +45,6 @@ private:
 
         // 2. publish
         pub_can_->publish(frame);
-
-        RCLCPP_INFO(this->get_logger(),
-                    "TX PGN: 0x%X DA: %d",
-                    msg->pgn, msg->dest_address);
     }
 
 private:

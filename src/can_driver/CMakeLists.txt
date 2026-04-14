@@ -16,12 +16,17 @@ include_directories(include)
 add_library(can_driver src/can_driver.cpp)
 ament_target_dependencies(can_driver rclcpp std_msgs custom_msgs) # 의존성 연결
 
-add_executable(can_node src/can_node.cpp) # 새로운 실행 파일
-ament_target_dependencies(can_node rclcpp std_msgs custom_msgs) # 의존성 연결
+add_executable(can0_node src/can0_node.cpp) # 새로운 실행 파일
+ament_target_dependencies(can0_node rclcpp std_msgs custom_msgs) # 의존성 연결
 
-target_link_libraries(can_node can_driver)
+add_executable(can1_node src/can1_node.cpp) # 새로운 실행 파일
+ament_target_dependencies(can1_node rclcpp std_msgs custom_msgs) # 의존성 연결
 
-install(TARGETS can_node DESTINATION lib/${PROJECT_NAME})
+target_link_libraries(can0_node can_driver)
+target_link_libraries(can1_node can_driver)
+
+install(TARGETS can0_node DESTINATION lib/${PROJECT_NAME})
+install(TARGETS can1_node DESTINATION lib/${PROJECT_NAME})
 
 install(TARGETS can_driver DESTINATION lib)
 

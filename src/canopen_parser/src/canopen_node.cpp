@@ -10,7 +10,7 @@ public:
     {
         // candriver -> canopen parser
         sub_can_ = create_subscription<custom_msgs::msg::CanFrame>(
-            "/can_rx", 50,
+            "/can1_rx", 50,
             std::bind(&CANopenNode::canCallback, this, std::placeholders::_1));
         // canopen parser -> other device
         pub_canopen_ = create_publisher<custom_msgs::msg::CanopenMsg>("/canopen_rx", 50);
@@ -21,7 +21,7 @@ public:
             std::bind(&CANopenNode::canopenCallback, this, std::placeholders::_1));
 
         // canopen parser -> candriver
-        pub_can_ = create_publisher<custom_msgs::msg::CanFrame>("/can_tx", 50);
+        pub_can_ = create_publisher<custom_msgs::msg::CanFrame>("/can1_tx", 50);
     }
 
 private:
@@ -32,20 +32,12 @@ private:
 
         auto msg = CANopenParser::parse(*frame);
         pub_canopen_->publish(msg);
-
-        RCLCPP_INFO(this->get_logger(),
-                    "RX CANopen COB-ID: 0x%X Node: %d",
-                    msg.cob_id, msg.node_id);
     }
 
     void canopenCallback(const custom_msgs::msg::CanopenMsg::SharedPtr msg)
     {
         auto frame = CANopenParser::build(*msg);
         pub_can_->publish(frame);
-
-        RCLCPP_INFO(this->get_logger(),
-                    "TX CANopen COB-ID: 0x%X Node: %d",
-                    msg->cob_id, msg->node_id);
     }
 
 private:
