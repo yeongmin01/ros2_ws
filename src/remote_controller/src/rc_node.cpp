@@ -48,10 +48,10 @@ private:
     {
         int key = getch_nonblock();
 
-        if (key == 'w' && rc_cmd.velocity <= 250) rc_cmd.velocity += 1;
+        if (key == 'w' && rc_cmd.velocity < 250) rc_cmd.velocity += 1;
         if (key == 's' && rc_cmd.velocity > 127) rc_cmd.velocity -= 1;
-        if (key == 'a' && rc_cmd.steer < 249) rc_cmd.steer += 1;
-        if (key == 'd' && rc_cmd.steer >= 10) rc_cmd.steer -= 1;
+        if (key == 'd' && rc_cmd.steer < 249) rc_cmd.steer += 1;
+        if (key == 'a' && rc_cmd.steer > 10) rc_cmd.steer -= 1;
         if (key == '1') 
         {
             rc_state.rc_forward = true;
@@ -68,6 +68,7 @@ private:
         }
 
         publishRCCmd();  // 항상 실행
+        publishRCState();
 
         RCLCPP_INFO(this->get_logger(),"RC State [%s]  vel: %d steer: %d",getRCLog(rc_state).c_str(),  rc_cmd.velocity, rc_cmd.steer);
     }
@@ -82,8 +83,8 @@ private:
         msg.dest_address = RCProtocol::RCCmdtoVCU_Protocol.dest_address;
         msg.dlc = 8;
 
-        msg.data[0] = rc_cmd.velocity & 0xFF;
-        msg.data[2] = rc_cmd.steer & 0xFF;
+        msg.data[0] = rc_cmd.steer & 0xFF;
+        msg.data[2] = rc_cmd.velocity & 0xFF;
 
         pub_->publish(msg);
     }
