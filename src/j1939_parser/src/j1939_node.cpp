@@ -30,7 +30,7 @@ private:
     void canCallback(const custom_msgs::msg::CanFrame::SharedPtr frame)
     {
         // 1. raw → j1939
-        if (!J1939Parser::isJ1939(frame->id))
+        if (!J1939Parser::isJ1939(*frame))
             return;
 
         auto j = J1939Parser::parse(*frame);
