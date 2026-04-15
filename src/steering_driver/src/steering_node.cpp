@@ -88,12 +88,13 @@ private:
 
         steer_msg.function_code = steer_protocol.function_code;
         steer_msg.node_id = steer_protocol.node_id;
+        steer_msg.dlc = 8;
 
         steer_msg.data[0] = position_cur & 0xFF;
         steer_msg.data[1] = (position_cur >> 8) & 0xFF;
-        steer_msg.data[2] = (position_cur >> 8) & 0xFF;
-        steer_msg.data[3] = (position_cur >> 8) & 0xFF;
-
+        steer_msg.data[2] = (position_cur >> 16) & 0xFF;
+        steer_msg.data[3] = (position_cur >> 24) & 0xFF;
+        
         steer_to_vcu_pub_->publish(steer_msg);
     }
 
