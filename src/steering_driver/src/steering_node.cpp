@@ -131,7 +131,7 @@ private:
     rclcpp::TimerBase::SharedPtr steer_to_vcu_send_timer_;
     rclcpp::TimerBase::SharedPtr set_steer_req_timer_;
 
-    SteeringProtocol::SteeringCmd steering_cmd{};
+    SteeringProtocol::SteeringCmd steering_cmd = {{SteeringMath::zero_position_ampere, SteeringMath::zero_position_ampere, SteeringMath::zero_position_ampere, SteeringMath::zero_position_ampere}, {0.0f, 0.0f, 0.0f, 0.0f}};
     SteeringProtocol::SteeringCur steering_cur{};
 };
 
