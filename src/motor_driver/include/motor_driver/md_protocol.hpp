@@ -24,8 +24,10 @@ namespace MDProtocol
         int16_t rpm_cur; // emulator -> vcu current RPM 
     };
 
-    constexpr ProtocolConfig MD1toVCU_Protocol = {0xF3CB, 6, 0xCB, 0x5B};
-    constexpr ProtocolConfig MD2toVCU_Protocol = {0xF3CB, 6, 0xCB, 0x5A};
+    constexpr ProtocolConfig MD1toVCU_Protocol11 = {0xF3CB, 6, 0xCB, 0x5B};
+    constexpr ProtocolConfig MD1toVCU_Protocol4 = {0xF3C4, 6, 0xCB, 0x5B};
+    constexpr ProtocolConfig MD2toVCU_Protocol11 = {0xF3CB, 6, 0xCB, 0x5A};
+    constexpr ProtocolConfig MD2toVCU_Protocol4 = {0xF3C4, 6, 0xCB, 0x5A};
     constexpr ProtocolConfig VCUtoMD1_Protocol = {0xF3E2, 6, 0xE2, 0x27};
     constexpr ProtocolConfig VCUtoMD2_Protocol = {0xF3E2, 6, 0xE2, 0x26};
 }
