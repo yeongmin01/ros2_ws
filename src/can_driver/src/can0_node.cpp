@@ -31,7 +31,9 @@ private:
     {
         can_frame frame{};
         
-        frame.can_id = msg -> id;
+        if (msg->is_extended) frame.can_id = (msg->id & CAN_EFF_MASK) | CAN_EFF_FLAG;
+        else frame.can_id = msg->id;
+
         frame.can_dlc = msg -> dlc;
         for(int i=0; i<frame.can_dlc; i++)
         {
@@ -50,7 +52,8 @@ private:
             if (driver_.receiveFrame(frame))
             {
                 custom_msgs::msg::CanFrame msg;
-                msg.id = frame.can_id;
+                msg.id = frame.can_id & CAN_EFF_MASK;
+                msg.is_extended = frame.can_id & CAN_EFF_FLAG;
                 msg.dlc = frame.can_dlc;
                 for(int i=0; i<frame.can_dlc; i++)
                 {
