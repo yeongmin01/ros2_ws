@@ -77,7 +77,7 @@ private:
         steering_cmd_msg.steering_cmd.data.resize(4);
         for(size_t i = 0; i< msg->steer_req.size(); i++)
         {
-            steering_cmd_msg.steering_cmd.data[0] = static_cast<int16_t>(msg -> steer_req[i] * 10);
+            steering_cmd_msg.steering_cmd.data[i] = static_cast<int16_t>(msg -> steer_req[i] * 10);
         }
 
         emulator_to_issac_steering_cmd_pub_ -> publish(steering_cmd_msg);
