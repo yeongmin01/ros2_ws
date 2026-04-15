@@ -27,9 +27,9 @@ public:
 private:
     void canCallback(const custom_msgs::msg::CanFrame::SharedPtr frame)
     {
-        if (!CANopenParser::isCANopen(frame->id))
+        if (!CANopenParser::isCANopen(*frame))
             return;
-
+        // CANOpen SDO 처리
         auto msg = CANopenParser::parse(*frame);
         pub_canopen_->publish(msg);
     }

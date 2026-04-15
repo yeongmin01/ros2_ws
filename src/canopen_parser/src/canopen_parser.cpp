@@ -1,9 +1,9 @@
 #include "canopen_parser/canopen_parser.hpp"
 
 // CANopen 여부 판단 (Standard Frame)
-bool CANopenParser::isCANopen(uint32_t can_id)
+bool CANopenParser::isCANopen(const custom_msgs::msg::CanFrame &frame)
 {
-    return !(can_id & CAN_EFF_FLAG);
+    return !(frame.is_extended);
 }
 
 // COB-ID 추출

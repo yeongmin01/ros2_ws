@@ -10,7 +10,7 @@ public:
     static custom_msgs::msg::CanFrame build(const custom_msgs::msg::CanopenMsg &msg);
     static custom_msgs::msg::CanopenMsg parse(const custom_msgs::msg::CanFrame &frame);
 
-    static bool isCANopen(uint32_t can_id);
+    static bool isCANopen(const custom_msgs::msg::CanFrame &frame);
 
 private:
     static uint16_t extractCobId(uint32_t can_id);
