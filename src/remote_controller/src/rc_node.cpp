@@ -49,9 +49,33 @@ private:
         int key = getch_nonblock();
 
         if (key == 'w' && rc_cmd.velocity < 250) rc_cmd.velocity += 1;
-        if (key == 's' && rc_cmd.velocity > 127) rc_cmd.velocity -= 1;
+        if (key == 's') rc_cmd.velocity = 0;
+        if (key == 'x' && rc_cmd.velocity > 127) rc_cmd.velocity -= 1;
         if (key == 'd' && rc_cmd.steer < 249) rc_cmd.steer += 1;
         if (key == 'a' && rc_cmd.steer > 10) rc_cmd.steer -= 1;
+        if (key == 'q') 
+        {
+            if(rc_cmd.steer > 10)
+            {
+                rc_cmd.steer -= 1;
+            }
+            if(rc_cmd.velocity < 250)
+            {
+                rc_cmd.velocity += 1;
+            }
+        }
+        if (key == 'e') 
+        {
+            if(rc_cmd.steer < 249)
+            {
+                rc_cmd.steer += 1;
+            }
+            if(rc_cmd.velocity < 250)
+            {
+                rc_cmd.velocity += 1;
+            }
+        }
+
         if (key == '1') 
         {
             rc_state.rc_forward = true;
