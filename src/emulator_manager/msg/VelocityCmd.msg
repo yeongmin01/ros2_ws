@@ -1,1 +1,0 @@
-std_msgs/Int16MultiArray velocity_cmd

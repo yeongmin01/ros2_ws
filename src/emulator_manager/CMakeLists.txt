@@ -10,27 +10,10 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(custom_msgs REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/SteeringCmd.msg"
-  "msg/SteeringFb1.msg"
-  "msg/SteeringFb2.msg"
-  "msg/VelocityCmd.msg"
-  "msg/VelocityFb.msg"
-  DEPENDENCIES std_msgs
-)
-ament_export_dependencies(rosidl_default_runtime)
 
 include_directories(include)
 add_executable(emulator_node src/emulator_node.cpp) # 새로운 실행 파일
-ament_target_dependencies(emulator_node rclcpp custom_msgs) # 의존성 연결
-
-rosidl_get_typesupport_target(cpp_typesupport_target
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
-
-target_link_libraries(emulator_node
-  ${cpp_typesupport_target})
+ament_target_dependencies(emulator_node rclcpp custom_msgs std_msgs) # 의존성 연결
 
 install(TARGETS emulator_node DESTINATION lib/${PROJECT_NAME})
 
