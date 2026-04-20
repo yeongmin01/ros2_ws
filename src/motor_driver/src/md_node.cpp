@@ -53,14 +53,17 @@ private:
     void parseVCUtoMD(const custom_msgs::msg::J1939Msg::SharedPtr msg)
     {
         if (msg->dlc < 8) return;
-        int16_t torque_req = msg->data[4] | (msg->data[5] << 8);
+
+        int16_t torque_req = static_cast<int16_t>(msg->data[4] | (msg->data[5] << 8));
         
         switch(msg->source_address)
         {
             case MDProtocol::VCUtoMD1_Protocol.source_address:
+            RCLCPP_INFO(this->get_logger(), "MD1 Torque: %d", torque_req);
                 md1_cmd.torque_req = torque_req;
                 break;
             case MDProtocol::VCUtoMD2_Protocol.source_address:
+            RCLCPP_INFO(this->get_logger(), "MD2 Torque: %d", torque_req);
                 md2_cmd.torque_req = torque_req;
                 break;
             default:
@@ -74,7 +77,7 @@ private:
     void mdToVCUSendLoop()
     {
         publishMDtoVCU(MDProtocol::MD1toVCU_Protocol4, MDProtocol::MD1toVCU_Protocol11, md1_cur);
-        publishMDtoVCU(MDProtocol::MD2toVCU_Protocol4, MDProtocol::MD1toVCU_Protocol11, md2_cur);
+        publishMDtoVCU(MDProtocol::MD2toVCU_Protocol4, MDProtocol::MD2toVCU_Protocol11, md2_cur);
         //RCLCPP_INFO(this->get_logger(), "MD1 RPM: %d MD2 RPM: %d", md1_cur.rpm_cur, md2_cur.rpm_cur);
     }
 
@@ -103,7 +106,7 @@ private:
         
         // 현재 velocity -> rpm으로 변환 후 VCU에 전송
         md_cur.rpm_cur = MDMath::convertVelocityToRPM(md_cur.velocity_cur);
-
+        
         md_msg11.data[4] = md_cur.rpm_cur & 0xFF;
         md_msg11.data[5] = (md_cur.rpm_cur >> 8) & 0xFF;
 
@@ -113,8 +116,8 @@ private:
     // torque req에 따라 acceleartion을 적용한 velocity req 전달
     void setVelocityReqLoop()
     {
-        md1_cmd.velocity_req = MDMath::setVelocityReq(md1_cur.velocity_cur, md1_cmd.torque_req);
-        md2_cmd.velocity_req = MDMath::setVelocityReq(md2_cur.velocity_cur, md2_cmd.torque_req);
+        md1_cmd.velocity_req = MDMath::setVelocityReq(md1_cmd.velocity_req, md1_cur.velocity_cur, md1_cmd.torque_req);
+        md2_cmd.velocity_req = MDMath::setVelocityReq(md2_cmd.velocity_req, md2_cur.velocity_cur, md2_cmd.torque_req);
 
         custom_msgs::msg::VelocityReq velocity_req;
         velocity_req.md1_velocity_req = md1_cmd.velocity_req;
