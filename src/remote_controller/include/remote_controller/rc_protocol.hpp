@@ -22,7 +22,8 @@ namespace RCProtocol
     struct RCState
     {
         bool rc_start = true;
-        bool rc_forward = false;
+        bool rc_auto = true;
+        bool rc_forward = true;
         bool rc_backward = false;
         bool rc_not_crab = true;
     };
