@@ -2,7 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <unistd.h>
-
+#include <cmath>
 //std::array<uint16_t, 8> convertAxisSteeringToPosition(std::array<float, 4> axis_steering)
 //{
 //    std::array<uint16_t, 8> position{};
@@ -32,7 +32,7 @@ std::array<uint32_t, 8> SteeringMath::convertWheelSteeringToPosition(std::array<
     {
         if(wheel_steering[i] < 0)
         {
-            position[i] = SteeringMath::max_absENC_position - (wheel_steering[i] / SteeringMath::degree_per_position);
+            position[i] = SteeringMath::max_absENC_position - (fabs(wheel_steering[i]) / SteeringMath::degree_per_position);
         }
         else
         {

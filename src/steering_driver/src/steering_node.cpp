@@ -4,6 +4,7 @@
 #include "steering_driver/steering_protocol.hpp"
 #include "custom_msgs/msg/steer_req.hpp"
 #include "custom_msgs/msg/steer_cur.hpp"
+#include <cmath>
 
 #include <termios.h>
 #include <unistd.h>
@@ -61,8 +62,7 @@ private:
         steering_cmd.ampere_req[2] = msg->data[4] | (msg->data[5] << 8);
         steering_cmd.ampere_req[3] = msg->data[6] | (msg->data[7] << 8);
 
-        //RCLCPP_INFO(this->get_logger(), "Ampere req: [%d, %d, %d, %d] ", steering_cmd.ampere_req[0] , steering_cmd.ampere_req[1],
-        //                                                                    steering_cmd.ampere_req[2], steering_cmd.ampere_req[3]);
+        RCLCPP_INFO(this->get_logger(), "[%d, %d, %d, %d]", steering_cmd.ampere_req[0], steering_cmd.ampere_req[1], steering_cmd.ampere_req[2], steering_cmd.ampere_req[3]);
     }
 
     // cur steering angle -> AbsENC position 변환 후 전달
@@ -110,7 +110,6 @@ private:
         }
 
         steer_req_pub_ -> publish(steer_req_msg);
-        //RCLCPP_INFO(this->get_logger(), "Steer Req: [%d, %d, %d, %d]", steer_req, md2_cur.velocity_cur);
     }
 
     // issac sim으로 부터 전달된 현재 velocity

@@ -43,34 +43,65 @@ public:
 private:
     void callback(const custom_msgs::msg::J1939Msg::SharedPtr msg)
     {
-        if(msg->pgn == MDProtocol::VCUtoMD1_Protocol.pgn || msg->pgn == MDProtocol::VCUtoMD2_Protocol.pgn) 
+        if(msg->pgn == MDProtocol::VCUtoMD1_Protocol1.pgn || msg->pgn == MDProtocol::VCUtoMD2_Protocol1.pgn) 
         {
-            parseVCUtoMD(msg); 
+            parseVCUtoMD1(msg); 
         }
+        else if(msg->pgn == MDProtocol::VCUtoMD1_Protocol2.pgn || msg->pgn == MDProtocol::VCUtoMD2_Protocol2.pgn)
+        {
+            parseVCUtoMD2(msg); 
+        }
+        //RCLCPP_INFO(this->get_logger(), "MD1 [%d, %d, %d]", md1_cmd.torque_req, md1_cmd.gear_d, md1_cmd.gear_r);
+        //RCLCPP_INFO(this->get_logger(), "MD2 [%d, %d, %d]", md2_cmd.torque_req, md2_cmd.gear_d, md2_cmd.gear_r);
     }
 
-    // VCU -> Motor torque request parsing
-    void parseVCUtoMD(const custom_msgs::msg::J1939Msg::SharedPtr msg)
+    // VCU -> Motor gear set request parsing
+    void parseVCUtoMD1(const custom_msgs::msg::J1939Msg::SharedPtr msg)
     {
         if (msg->dlc < 8) return;
 
-        int16_t torque_req = static_cast<int16_t>(msg->data[4] | (msg->data[5] << 8));
-        
+        bool gear_n = (msg->data[0] & (1 << 5)) != 0;
+        bool gear_d = (msg->data[0] & (1 << 6)) != 0;
+        bool gear_r = (msg->data[0] & (1 << 7)) != 0;
+
         switch(msg->source_address)
-        {
-            case MDProtocol::VCUtoMD1_Protocol.source_address:
-            RCLCPP_INFO(this->get_logger(), "MD1 Torque: %d", torque_req);
-                md1_cmd.torque_req = torque_req;
+        {       
+            case MDProtocol::VCUtoMD1_Protocol1.source_address:
+                md1_cmd.gear_n = gear_n;    
+                md1_cmd.gear_d = gear_d;
+                md1_cmd.gear_r = gear_r;
                 break;
-            case MDProtocol::VCUtoMD2_Protocol.source_address:
-            RCLCPP_INFO(this->get_logger(), "MD2 Torque: %d", torque_req);
-                md2_cmd.torque_req = torque_req;
+            case MDProtocol::VCUtoMD2_Protocol1.source_address:
+                md2_cmd.gear_n = gear_n; 
+                md2_cmd.gear_d = gear_d;
+                md2_cmd.gear_r = gear_r;
                 break;
             default:
                 return;
         };
 
-        //RCLCPP_INFO(this->get_logger(), "MD1 Torque Cmd: %d, MD1 Torque Cmd: %d", md1_cmd.torque_req, md2_cmd.torque_req);
+        
+    }
+
+    // VCU -> Motor torque request parsing
+    void parseVCUtoMD2(const custom_msgs::msg::J1939Msg::SharedPtr msg)
+    {
+        if (msg->dlc < 8) return;
+
+        int16_t torque_req = static_cast<int16_t>(msg->data[4] | (msg->data[5] << 8));
+        switch(msg->source_address)
+        {
+            case MDProtocol::VCUtoMD1_Protocol2.source_address:
+                md1_cmd.torque_req = torque_req;
+                RCLCPP_INFO(this->get_logger(), "MD1 [%d]", torque_req);
+                break;
+            case MDProtocol::VCUtoMD2_Protocol2.source_address:
+                md2_cmd.torque_req = torque_req;
+                RCLCPP_INFO(this->get_logger(), "MD2 [%d]", torque_req);
+                break;
+            default:
+                return;
+        };
     }
 
     // cur velocity를 cur RPM으로 변환 후 전달
@@ -116,8 +147,8 @@ private:
     // torque req에 따라 acceleartion을 적용한 velocity req 전달
     void setVelocityReqLoop()
     {
-        md1_cmd.velocity_req = MDMath::setVelocityReq(md1_cmd.velocity_req, md1_cur.velocity_cur, md1_cmd.torque_req);
-        md2_cmd.velocity_req = MDMath::setVelocityReq(md2_cmd.velocity_req, md2_cur.velocity_cur, md2_cmd.torque_req);
+        md1_cmd.velocity_req = MDMath::setVelocityReq(md1_cmd, md1_cur.velocity_cur);
+        md2_cmd.velocity_req = MDMath::setVelocityReq(md2_cmd, md2_cur.velocity_cur);
 
         custom_msgs::msg::VelocityReq velocity_req;
         velocity_req.md1_velocity_req = md1_cmd.velocity_req;

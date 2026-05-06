@@ -44,12 +44,12 @@ public:
 
         // issac sim -> emulator steering feedback1
         issac_to_emulator_Steering_fb1_sub_ = create_subscription<std_msgs::msg::Int16MultiArray>(
-                                        "/Isaac/steering_fb1", 50,
+                                        "/Isaac/steering_fb_1", 50,
                                         std::bind(&EmulatorNode::steeringFB1Callback, this, std::placeholders::_1));
 
         // issac sim -> emulator steering feedback2
         issac_to_emulator_Steering_fb2_sub_ = create_subscription<std_msgs::msg::Int16MultiArray>(
-                                        "/Isaac/steering_fb2", 50,
+                                        "/Isaac/steering_fb_2", 50,
                                         std::bind(&EmulatorNode::steeringFB2Callback, this, std::placeholders::_1));
     }
 
@@ -81,8 +81,8 @@ private:
     void velocityFBCallback(const std_msgs::msg::Int16MultiArray::SharedPtr msg)
     {
         custom_msgs::msg::VelocityCur velocity_cur_msg;
-        velocity_cur_msg.md1_velocity_cur = static_cast<float>(msg -> data[0]) / 100;
-        velocity_cur_msg.md2_velocity_cur = static_cast<float>(msg -> data[1]) / 100;
+        velocity_cur_msg.md1_velocity_cur = (static_cast<float>(msg -> data[0])/100);
+        velocity_cur_msg.md2_velocity_cur = (static_cast<float>(msg -> data[1])/100);
 
         velocity_cur_pub_ -> publish(velocity_cur_msg);
     }

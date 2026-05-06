@@ -9,7 +9,7 @@ class SteeringMath
         static std::array<float, 4> convertWheelSteerToAxisSteer(std::array<float, 8> wheel_steering_cur);
         static std::array<float, 4> setSteeringReq(std::array<float, 8> steering_cur, std::array<uint16_t, 4> current_req);
 
-        static constexpr float max_angular_velocity = 13.9f;
+        static constexpr float max_angular_velocity = 13.9; //13.9f;
         static constexpr uint16_t max_ampere = 32767;
         static constexpr uint16_t min_ampere = 6558;
         static constexpr uint16_t zero_position_ampere = 19660;

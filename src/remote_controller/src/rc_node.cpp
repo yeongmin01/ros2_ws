@@ -48,45 +48,49 @@ private:
     {
         int key = getch_nonblock();
 
-        if (key == 'w' && rc_cmd.velocity < 250) rc_cmd.velocity += 1;
-        if (key == 's') rc_cmd.velocity = 0;
-        if (key == 'x' && rc_cmd.velocity > 127) rc_cmd.velocity -= 1;
-        if (key == 'd' && rc_cmd.steer < 249) rc_cmd.steer += 1;
-        if (key == 'a' && rc_cmd.steer > 10) rc_cmd.steer -= 1;
+        if (key == 'w' && rc_cmd.velocity < 239) rc_cmd.velocity += 10;
+        if (key == 's') rc_cmd.velocity = 127;
+        if (key == 'x' && rc_cmd.velocity > 137) rc_cmd.velocity -= 10;
+        if (key == 'd' && rc_cmd.steer < 239) rc_cmd.steer += 10;
+        if (key == 'a' && rc_cmd.steer > 20) rc_cmd.steer -= 10;
         if (key == 'q') 
         {
-            if(rc_cmd.steer > 10)
+            if(rc_cmd.steer > 20)
             {
-                rc_cmd.steer -= 1;
+                rc_cmd.steer -= 10;
             }
-            if(rc_cmd.velocity < 250)
+            if(rc_cmd.velocity < 239)
             {
-                rc_cmd.velocity += 1;
+                rc_cmd.velocity += 10;
             }
         }
         if (key == 'e') 
         {
-            if(rc_cmd.steer < 249)
+            if(rc_cmd.steer < 239)
             {
-                rc_cmd.steer += 1;
+                rc_cmd.steer += 10;
             }
-            if(rc_cmd.velocity < 250)
+            if(rc_cmd.velocity < 239)
             {
-                rc_cmd.velocity += 1;
+                rc_cmd.velocity += 10;
             }
         }
 
         if (key == '1') 
         {
+            rc_state.rc_manual= !rc_state.rc_manual;
+        }
+        if (key == '2') 
+        {
             rc_state.rc_forward = true;
             rc_state.rc_backward = false;
         }
-        if (key == '2') 
+        if (key == '3') 
         {
             rc_state.rc_forward = false;
             rc_state.rc_backward = true;
         }
-        if (key == '3') 
+        if (key == '4') 
         {
             rc_state.rc_not_crab = !rc_state.rc_not_crab;
         }
@@ -123,6 +127,7 @@ private:
         msg.dest_address = RCProtocol::RCStatetoVCU_Protocol.dest_address;
         msg.dlc = 8;
 
+        msg.data[2] = (msg.data[2] & ~(1 << 4)) | (rc_state.rc_manual << 4);
         msg.data[2] = (msg.data[2] & ~(1 << 5)) | (rc_state.rc_not_crab << 5);
         msg.data[2] = (msg.data[2] & ~(1 << 6)) | (rc_state.rc_forward << 6);
         msg.data[2] = (msg.data[2] & ~(1 << 7)) | (rc_state.rc_backward << 7);
@@ -133,8 +138,17 @@ private:
 
     std::string getRCLog(RCProtocol::RCState rc_state)
     {
+        std::string rc_mode_log = "";
         std::string rc_movement_log = "";
         std::string rc_crab_mode_log = "";
+        if(rc_state.rc_manual)
+        {
+            rc_mode_log = "Manual";
+        }
+        else
+        {
+            rc_mode_log = "Auto";
+        }
         if(rc_state.rc_forward && !rc_state.rc_backward)
         {
             rc_movement_log = "Forward";
@@ -160,7 +174,7 @@ private:
             rc_crab_mode_log = "Crab";
         }
 
-        return rc_movement_log + ", " + rc_crab_mode_log;
+        return rc_mode_log + ", " + rc_movement_log + ", " + rc_crab_mode_log;
     }
 
 private:
